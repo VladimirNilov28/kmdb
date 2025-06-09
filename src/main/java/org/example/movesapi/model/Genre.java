@@ -1,11 +1,10 @@
-package org.example.movesapi.entity;
+package org.example.movesapi.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -14,18 +13,18 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(of = "id")       // только по ID
+//@ToString(exclude = {"movies"})     // исключи рекурсивные поля
 
 @Entity
-public class Actor {
+public class Genre {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @NotBlank
+    private String genre;
 
-    private LocalDate birthDate;
-
-    @ManyToMany(mappedBy = "actors")
+    @ManyToMany(mappedBy = "genres")
     private Set<Movie> movies = new HashSet<>();
 }

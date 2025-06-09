@@ -1,4 +1,4 @@
-package org.example.movesapi.entity;
+package org.example.movesapi.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,8 +26,20 @@ public class Movie {
     private int releaseYear;
 
     @ManyToMany
+    @JoinTable(
+            name = "movie_genres",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
+
+    )
     private Set<Genre> genres = new HashSet<>();
 
     @ManyToMany
+    @JoinTable(
+            name = "movie_actors",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "actor_id" +
+                    "")
+    )
     private Set<Actor> actors = new HashSet<>();
 }
