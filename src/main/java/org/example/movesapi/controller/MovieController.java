@@ -20,12 +20,12 @@ public class MovieController {
 
     @GetMapping
     private ResponseEntity<List<Movie>> findAll() {
-        return null;
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{id}")
     private ResponseEntity<Movie> findById(@PathVariable Long id) {
-        return null;
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping
@@ -42,17 +42,5 @@ public class MovieController {
     private ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
         return null;
     }
-
-    @DeleteMapping("/{id}")
-    private ResponseEntity<Void> forceDeleteMovies(@PathVariable Long id, Pageable pageable) {
-        return null;
-    }
-
-
-
-
-
-
-
 
 }
