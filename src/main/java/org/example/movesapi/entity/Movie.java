@@ -28,8 +28,6 @@ public class Movie {
     @ManyToMany
     private Set<Genre> genres = new HashSet<>();
 
-
-
     @ManyToMany
     private Set<Actor> actors = new HashSet<>();
 }
