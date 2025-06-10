@@ -1,6 +1,7 @@
 package org.example.movesapi.controller;
 
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.example.movesapi.model.Movie;
 import org.example.movesapi.repository.MovieRepository;
@@ -55,7 +56,7 @@ public class MovieController {
 
         if (movie != null) {
             fields.forEach((key, value) -> {
-                Field field = ReflectionUtils.findField(Movie.class, key);//continue
+                Field field = ReflectionUtils.findField(Movie.class, key);
                 if (field != null) {
                     field.setAccessible(true);
                     ReflectionUtils.setField(field, movie, value);
@@ -64,7 +65,7 @@ public class MovieController {
             movieRepository.save(movie);
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.notFound().build();
+        throw new EntityNotFoundException("Movie with id " + id + " not found");
     }
 
     @DeleteMapping("/{id}")
