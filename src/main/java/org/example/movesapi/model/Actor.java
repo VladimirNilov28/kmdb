@@ -1,5 +1,6 @@
 package org.example.movesapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -30,5 +31,6 @@ public class Actor {
     private LocalDate birthDate;
 
     @ManyToMany(mappedBy = "actors")
+    @JsonIgnore
     private Set<Movie> movies = new HashSet<>();
 }

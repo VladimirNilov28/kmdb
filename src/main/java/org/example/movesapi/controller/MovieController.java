@@ -20,12 +20,17 @@ public class MovieController {
 
     @GetMapping
     private ResponseEntity<List<Movie>> findAll() {
-        return ResponseEntity.notFound().build();
+        List<Movie> movies = movieRepository.findAll();
+        return ResponseEntity.ok(movies);
     }
 
     @GetMapping("/{id}")
     private ResponseEntity<Movie> findById(@PathVariable Long id) {
-        return ResponseEntity.notFound().build();
+        Movie movie = movieRepository.findById(id).orElse(null);
+        if (movie == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(movie);
     }
 
     @PostMapping

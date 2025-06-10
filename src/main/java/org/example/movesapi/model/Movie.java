@@ -1,5 +1,6 @@
 package org.example.movesapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,6 +33,7 @@ public class Movie {
             inverseJoinColumns = @JoinColumn(name = "genre_id")
 
     )
+    @JsonIgnoreProperties("movies")
     private Set<Genre> genres = new HashSet<>();
 
     @ManyToMany
@@ -40,5 +42,6 @@ public class Movie {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "actor_id")
     )
+    @JsonIgnoreProperties("movies")
     private Set<Actor> actors = new HashSet<>();
 }
