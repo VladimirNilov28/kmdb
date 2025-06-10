@@ -33,13 +33,17 @@ class MovesApiApplicationTests {
 
     @Test
     void shouldReturnMovies() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/movies", String.class);
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/movies", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     void shouldReturnMovieByIdWith200andCorrectMovie() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/movies/1", String.class);
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/movies/1", String.class);
         System.out.println("BODY: " + response.getBody());
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -54,7 +58,9 @@ class MovesApiApplicationTests {
 
     @Test
     void shouldReturn404WhenGetNonexistentMovie() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/movies/55", String.class);
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/movies/55", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
@@ -71,11 +77,15 @@ class MovesApiApplicationTests {
                 .actors(actors)
                 .build();
 
-        ResponseEntity<Void>  response = restTemplate.postForEntity("/movies", newMovie, Void.class);
+        ResponseEntity<Void>  response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .postForEntity("/movies", newMovie, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         URI location = response.getHeaders().getLocation();
-        ResponseEntity<String> getResponse = restTemplate.getForEntity(location, String.class);
+        ResponseEntity<String> getResponse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity(location, String.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
@@ -91,7 +101,9 @@ class MovesApiApplicationTests {
                 .actors(actors)
                 .build();
 
-        ResponseEntity<Void> response = restTemplate.postForEntity("/movies", newMovie, Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .postForEntity("/movies", newMovie, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
@@ -108,16 +120,22 @@ class MovesApiApplicationTests {
                 .actors(actors)
                 .build();
 
-        ResponseEntity<Void>  response = restTemplate.postForEntity("/movies", newMovie, Void.class);
+        ResponseEntity<Void>  response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .postForEntity("/movies", newMovie, Void.class);
         URI location = response.getHeaders().getLocation();
 
         Map<String,Object> movieUpdate = Map.of("releaseYear",2020);
         HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(movieUpdate);
 
-        ResponseEntity<Void> patchResponse = restTemplate.exchange(location, HttpMethod.PATCH, httpEntity, Void.class);
+        ResponseEntity<Void> patchResponse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange(location, HttpMethod.PATCH, httpEntity, Void.class);
         assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        ResponseEntity<Movie> getResponse = restTemplate.getForEntity(location, Movie.class);
+        ResponseEntity<Movie> getResponse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity(location, Movie.class);
         assertThat(getResponse.getBody().getReleaseYear()).isEqualTo(2020);
     }
 
@@ -126,7 +144,9 @@ class MovesApiApplicationTests {
         Map<String,Object> movieUpdate = Map.of("releaseYear",2020);
         HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(movieUpdate);
 
-        ResponseEntity<Void> patchResponse = restTemplate.exchange("/movies/99", HttpMethod.PATCH, httpEntity, Void.class);
+        ResponseEntity<Void> patchResponse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/movies/99", HttpMethod.PATCH, httpEntity, Void.class);
         assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
