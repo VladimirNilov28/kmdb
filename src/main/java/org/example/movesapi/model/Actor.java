@@ -24,7 +24,7 @@ public class Actor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Actor name is required")
     private String name;
 
     @NotNull

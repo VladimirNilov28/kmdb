@@ -23,7 +23,7 @@ public class Genre {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Genre name is required")
     private String genre;
 
     @ManyToMany(mappedBy = "genres")
