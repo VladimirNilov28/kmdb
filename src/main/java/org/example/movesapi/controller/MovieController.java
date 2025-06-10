@@ -51,32 +51,30 @@ public class MovieController {
 
     @PatchMapping("/{id}")
     private ResponseEntity<Void> updateMovie(@PathVariable Long id, @RequestBody Map<String, Object> fields) {
-        //NullPointerException handling
-        Optional<Movie> optional = movieRepository.findById(id);
-        if (optional.isEmpty()) return ResponseEntity.notFound().build();
+        Movie movie = movieRepository.findById(id).orElse(null);
 
-        Movie movie = optional.get();
-
-        fields.forEach((key, value) -> {
-            Field field = ReflectionUtils.findField(Movie.class, key);
-            //NullPointerException handling
-            if (field != null) {
-                field.setAccessible(true);
-                try {
+        if (movie != null) {
+            fields.forEach((key, value) -> {
+                Field field = ReflectionUtils.findField(Movie.class, key);//continue
+                if (field != null) {
+                    field.setAccessible(true);
                     ReflectionUtils.setField(field, movie, value);
-                } catch (Exception e) {
-                    //TODO Logging
                 }
-            }
-        });
-
-        movieRepository.save(movie);
-        return ResponseEntity.ok().build();
+            });
+            movieRepository.save(movie);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
-//    @DeleteMapping("/{id}")
-//    private ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
-//        return null;
-//    }
+    @DeleteMapping("/{id}")
+    private ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
+
+        if (movieRepository.existsById(id)) {
+            movieRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
 
 }

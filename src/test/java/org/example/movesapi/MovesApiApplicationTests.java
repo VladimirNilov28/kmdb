@@ -150,12 +150,27 @@ class MovesApiApplicationTests {
         assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
-//    @Test
-//    @DirtiesContext
-//    void shouldDeleteMovieWith204() {
-//        ResponseEntity<Void> response = restTemplate.exchange("/movies/204", HttpMethod.DELETE, null, Void.class);
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-//    }
+    @Test
+    @DirtiesContext
+    void shouldDeleteMovieWith204() {
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/movies/1", HttpMethod.DELETE, null, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        ResponseEntity<String> getResponse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/movies/1", String.class);
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldNotDeleteMovieThatNotExist() {
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/movies/101", HttpMethod.DELETE, null, Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
 
 
 }
