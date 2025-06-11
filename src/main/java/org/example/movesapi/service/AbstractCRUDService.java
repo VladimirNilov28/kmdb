@@ -44,7 +44,7 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
 
     @Override
     public void delete(ID id) {
-        r
+
     }
 
     @Override
