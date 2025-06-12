@@ -26,6 +26,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.notFound().build();
     }
 
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<Void> handleNullPointer(NullPointerException ex) {
+        return ResponseEntity.notFound().build();
+    }
+
+
     @ExceptionHandler(DependencyExistException.class)
     public ResponseEntity<Void> handleDependencyExist(DependencyExistException ex) {
         return ResponseEntity.badRequest().build();

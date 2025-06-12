@@ -18,6 +18,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -110,33 +111,47 @@ class MovesApiApplicationTests {
     @Test
     @DirtiesContext
     void shouldPatchMoviePartiallyAndReturn200() {
+        // Given — создаём жанры и актёров (предполагаем, что они уже есть в БД с id=1)
         Set<Genre> genres = Set.of(Genre.builder().id(1L).genre("Test Genre").build());
-        Set<Actor> actors = Set.of(Actor.builder().id(1L).name("John").build());
+        Set<Actor> actors = Set.of(Actor.builder().id(1L).name("John").birthDate(LocalDate.of(1970, 1, 1)).build());
 
-        Movie newMovie = Movie.builder()
-                .movieName("Test Movie")
-                .releaseYear(2004)
+        Movie originalMovie = Movie.builder()
+                .movieName("Original Movie")
+                .releaseYear(2000)
                 .genres(genres)
                 .actors(actors)
                 .build();
 
-        ResponseEntity<Void>  response = restTemplate
+        // When — создаём фильм
+        ResponseEntity<Void> postResponse = restTemplate
                 .withBasicAuth("admin", "admin")
-                .postForEntity("/movies", newMovie, Void.class);
-        URI location = response.getHeaders().getLocation();
+                .postForEntity("/movies", originalMovie, Void.class);
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        Map<String,Object> movieUpdate = Map.of("releaseYear",2020);
-        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(movieUpdate);
+        URI location = postResponse.getHeaders().getLocation();
+        assertThat(location).isNotNull();
+
+        // And — обновляем только releaseYear
+        Map<String, Object> moviePatch = Map.of("releaseYear", 2020);
+        HttpEntity<Map<String, Object>> patchRequest = new HttpEntity<>(moviePatch);
 
         ResponseEntity<Void> patchResponse = restTemplate
                 .withBasicAuth("admin", "admin")
-                .exchange(location, HttpMethod.PATCH, httpEntity, Void.class);
+                .exchange(location, HttpMethod.PATCH, patchRequest, Void.class);
         assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
+        // Then — проверяем, что только releaseYear обновился
         ResponseEntity<Movie> getResponse = restTemplate
                 .withBasicAuth("admin", "admin")
                 .getForEntity(location, Movie.class);
-        assertThat(getResponse.getBody().getReleaseYear()).isEqualTo(2020);
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        Movie patchedMovie = getResponse.getBody();
+        assertThat(patchedMovie).isNotNull();
+        assertThat(patchedMovie.getReleaseYear()).isEqualTo(2020);
+        assertThat(patchedMovie.getMovieName()).isEqualTo("Original Movie"); // не должен измениться
+        assertThat(patchedMovie.getGenres()).extracting(Genre::getId).containsExactly(1L); // не должны пропасть
+        assertThat(patchedMovie.getActors()).extracting(Actor::getId).containsExactly(1L); // не должны пропасть
     }
 
     @Test

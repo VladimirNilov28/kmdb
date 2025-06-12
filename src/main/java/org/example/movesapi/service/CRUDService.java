@@ -16,4 +16,5 @@ public interface CRUDService<T, ID> {
     void delete(ID id, boolean force);
     T getById(ID id);
     List<T> getAll();
+    ID extractId(T entity);
 }

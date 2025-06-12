@@ -4,27 +4,33 @@ import jakarta.validation.Valid;
 import org.example.movesapi.service.CRUDService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
+
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
 public abstract class BaseController<T, ID> {
 
     protected final CRUDService<T, ID> service;
-    protected abstract ID getId(T entity);
+    //protected abstract ID getId(T entity);
 
     public BaseController(CRUDService<T, ID> service) {
         this.service = service;
     }
 
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody @Valid T entity, UriComponentsBuilder uri) {
+    public ResponseEntity<Void> create(@RequestBody @Valid T entity) {
         T newEntity = service.create(entity);
-        return uri
+        ID id = service.extractId(newEntity);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(getId(newEntity))
+                .buildAndExpand(id)
                 .toUri();
+        return  ResponseEntity.created(location).build();
     }
 
     @PatchMapping("/{id}")

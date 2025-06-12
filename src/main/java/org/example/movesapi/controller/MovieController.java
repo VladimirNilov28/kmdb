@@ -13,6 +13,7 @@ public class MovieController extends BaseController<Movie, Long> {
         super(service);
     }
 
+
 //    @DeleteMapping("/{id}")
 //    public ResponseEntity<Void> delete(@PathVariable Long id,
 //                                    @RequestParam(required = false ) boolean force) {

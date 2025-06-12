@@ -24,6 +24,10 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
     public T create(T entity) {
         return repository.save(entity);
     }
+    @Override
+    public ID extractId(T entity) {
+        return getId(entity);
+    }
 
     @Override
     public T update(ID id, Map<String, Object> fields) {
