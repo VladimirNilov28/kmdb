@@ -155,7 +155,7 @@ class MovesApiApplicationTests {
     void shouldDeleteMovieWith204() {
         ResponseEntity<Void> response = restTemplate
                 .withBasicAuth("admin", "admin")
-                .exchange("/movies/1", HttpMethod.DELETE, null, Void.class);
+                .exchange("/movies/1?force=true", HttpMethod.DELETE, null, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         ResponseEntity<String> getResponse = restTemplate
@@ -163,6 +163,8 @@ class MovesApiApplicationTests {
                 .getForEntity("/movies/1", String.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
+
+    //TODO тесть на удаление фильма с пустыми связями
 
     @Test
     void shouldNotDeleteMovieThatNotExist() {

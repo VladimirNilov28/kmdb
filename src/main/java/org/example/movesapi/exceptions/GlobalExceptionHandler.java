@@ -18,17 +18,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Void> handleValidationException(MethodArgumentNotValidException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Void> handleNotFound(EntityNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(DependencyExistException.class)
     public ResponseEntity<Void> handleDependencyExist(DependencyExistException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.badRequest().build();
     }
 
 

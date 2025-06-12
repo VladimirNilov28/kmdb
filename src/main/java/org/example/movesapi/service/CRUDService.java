@@ -1,10 +1,7 @@
 package org.example.movesapi.service;
 
-import org.springframework.web.util.UriComponentsBuilder;
-
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Here is a interface for all our CRUD operations

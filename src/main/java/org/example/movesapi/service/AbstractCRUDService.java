@@ -15,7 +15,7 @@ import java.util.Map;
 public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
 
     protected final JpaRepository<T, ID> repository;
-
+    protected abstract ID getId(T entity);
     public AbstractCRUDService(JpaRepository<T, ID> repository) {
         this.repository = repository;
     }
@@ -39,17 +39,21 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
             });
             return repository.save(entity);
         }
-        return null;
+        throw new EntityNotFoundException("Entity with id " + id + " not found");
     }
 
+    //protected abstract void delete(ID id, boolean approve);
     @Override
-    public void delete(ID id, boolean approve) {
-        if(approve) {
-            repository.deleteById(id);
-        } else {
-            throw new DependencyExistException("Request denied, dependency exists");
+    public void delete(ID id, boolean force) {
+        if (!force && repository.existsById(id)) {
+            throw new DependencyExistException();
         }
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Entity with id " + id + " not found");
+        }
+        repository.deleteById(id);
     }
+    protected abstract boolean isDependencyExist(ID id);
 
     @Override
     public T getById(ID id) {

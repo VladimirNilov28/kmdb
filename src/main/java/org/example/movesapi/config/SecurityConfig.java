@@ -19,7 +19,7 @@ class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(rquest -> rquest
-                        .requestMatchers("/movies/**")
+                        .requestMatchers("/**")
                         .authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable());
