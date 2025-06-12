@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import java.util.Map;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -18,6 +20,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Void> handleValidationException(MethodArgumentNotValidException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Void> handleNotFound(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @ExceptionHandler(DependencyExistException.class)
+    public ResponseEntity<Void> handleDependencyExist(DependencyExistException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+
 
 //    @ExceptionHandler(HttpMessageNotReadableException.class)
 //    public ResponseEntity<Void> handleMalformedJson(HttpMessageNotReadableException ex) {

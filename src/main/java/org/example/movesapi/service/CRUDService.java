@@ -1,5 +1,7 @@
 package org.example.movesapi.service;
 
+import org.springframework.web.util.UriComponentsBuilder;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,7 +16,7 @@ import java.util.Optional;
 public interface CRUDService<T, ID> {
     T create(T entity);
     T update(ID id, Map<String, Object> entity);
-    void delete(ID id);
-    Optional<T> getById(ID id);
+    void delete(ID id, boolean force);
+    T getById(ID id);
     List<T> getAll();
 }

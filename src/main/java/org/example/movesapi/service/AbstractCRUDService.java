@@ -1,15 +1,15 @@
 package org.example.movesapi.service;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.example.movesapi.exceptions.DependencyExistException;
 import org.example.movesapi.model.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Transactional
 public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
@@ -43,17 +43,25 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
     }
 
     @Override
-    public void delete(ID id) {
-
+    public void delete(ID id, boolean approve) {
+        if(approve) {
+            repository.deleteById(id);
+        } else {
+            throw new DependencyExistException("Request denied, dependency exists");
+        }
     }
 
     @Override
-    public Optional<T> getById(ID id) {
-        return null;
+    public T getById(ID id) {
+        T entity = repository.findById(id).orElse(null);
+        if (entity != null) {
+            return entity;
+        }
+        throw new EntityNotFoundException("Entity with id " + id + " not found");
     }
 
     @Override
     public List<T> getAll() {
-        return null;
+        return repository.findAll();
     }
 }

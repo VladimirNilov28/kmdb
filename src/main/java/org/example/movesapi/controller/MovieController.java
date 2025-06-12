@@ -69,8 +69,9 @@ public class MovieController {
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
-
+    private ResponseEntity<Void> deleteMovie(@PathVariable Long id,
+                                             @RequestParam(required = false ) boolean force) {
+        boolean deleteApprove = (force || movieRepository.isDependencyExist(id));
         if (movieRepository.existsById(id)) {
             movieRepository.deleteById(id);
             return ResponseEntity.noContent().build();
