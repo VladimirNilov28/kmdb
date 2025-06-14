@@ -41,7 +41,7 @@ public abstract class BaseController<T, ID> {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable ID id,
-                                    @RequestParam(required = false ) Boolean force) {
+                                    @RequestParam(name = "force", required = false, defaultValue = "false") Boolean force) {
         service.delete(id, force);
         return ResponseEntity.noContent().build();
     }

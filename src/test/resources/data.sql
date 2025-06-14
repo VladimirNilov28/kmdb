@@ -1,4 +1,4 @@
-INSERT INTO genre (id, genre) VALUES (1, 'Action'), (2, 'Drama');
+INSERT INTO genre (id, name) VALUES (1, 'Action'), (2, 'Drama');
 
 INSERT INTO actor (id, name, birth_date) VALUES
                                              (1, 'Keanu Reeves', '1964-09-02'),

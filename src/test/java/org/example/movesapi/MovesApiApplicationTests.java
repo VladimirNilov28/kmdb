@@ -68,7 +68,7 @@ class MovesApiApplicationTests {
     @Test
     @DirtiesContext
     void shouldCreateMovieWith201andLocationHeader() {
-        Set<Genre> genres = Set.of(Genre.builder().id(1L).genre("Test Genre").build());
+        Set<Genre> genres = Set.of(Genre.builder().id(1L).name("Test Genre").build());
         Set<Actor> actors = Set.of(Actor.builder().id(1L).name("John").build());
 
         Movie newMovie = Movie.builder()
@@ -92,7 +92,7 @@ class MovesApiApplicationTests {
 
     @Test
     void shouldRejectCreateMovieWithInvalidData() {
-        Set<Genre> genres = Set.of(Genre.builder().id(null).genre("Test Genre").build());
+        Set<Genre> genres = Set.of(Genre.builder().id(null).name("Test Genre").build());
         Set<Actor> actors = Set.of(Actor.builder().id(null).name("").build());
 
         Movie newMovie = Movie.builder()
@@ -112,7 +112,7 @@ class MovesApiApplicationTests {
     @DirtiesContext
     void shouldPatchMoviePartiallyAndReturn200() {
         // Given — создаём жанры и актёров (предполагаем, что они уже есть в БД с id=1)
-        Set<Genre> genres = Set.of(Genre.builder().id(1L).genre("Test Genre").build());
+        Set<Genre> genres = Set.of(Genre.builder().id(1L).name("Test Genre").build());
         Set<Actor> actors = Set.of(Actor.builder().id(1L).name("John").birthDate(LocalDate.of(1970, 1, 1)).build());
 
         Movie originalMovie = Movie.builder()
@@ -187,6 +187,14 @@ class MovesApiApplicationTests {
                 .withBasicAuth("admin", "admin")
                 .exchange("/movies/101", HttpMethod.DELETE, null, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldNotDeleteMovieWithDependencyAndReturnConflict() {
+        ResponseEntity<Void> repsonse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/movies/1", HttpMethod.DELETE, null, Void.class);
+        assertThat(repsonse.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
 
 

@@ -26,13 +26,16 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
     }
     @Override
     public ID extractId(T entity) {
-        return getId(entity);
+        try {
+            return getId(entity);
+        } catch (NullPointerException e) {
+            throw new NullPointerException();
+        }
     }
 
     @Override
     public T update(ID id, Map<String, Object> fields) {
         T entity = repository.findById(id).orElse(null);
-
         if (entity != null) {
             fields.forEach((key, value) -> {
                 Field field = ReflectionUtils.findField(Movie.class, key);
@@ -42,20 +45,29 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
                 }
             });
             return repository.save(entity);
-        }
-        throw new EntityNotFoundException("Entity with id " + id + " not found");
-    }
-
-    //protected abstract void delete(ID id, boolean approve);
-    @Override
-    public void delete(ID id, boolean force) {
-        if (!force && repository.existsById(id)) {
-            throw new DependencyExistException();
-        }
-        if (!repository.existsById(id)) {
+        } else {
             throw new EntityNotFoundException("Entity with id " + id + " not found");
         }
-        repository.deleteById(id);
+    }
+
+    @Override
+    public void delete(ID id, boolean force) {
+        // 1) Если нет записи — 404
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Movie not found: " + id);
+        }
+        // 2) Если форс — удаляем несмотря ни на что
+        if (force) {
+            repository.deleteById(id);
+            return;
+        }
+        // 3) Если зависимостей нет — удаляем
+        if (!isDependencyExist(id)) {
+            repository.deleteById(id);
+            return;
+        }
+        // 4) Иначе — конфликт
+        throw new DependencyExistException();
     }
     protected abstract boolean isDependencyExist(ID id);
 
@@ -64,12 +76,17 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
         T entity = repository.findById(id).orElse(null);
         if (entity != null) {
             return entity;
+        } else {
+            throw new EntityNotFoundException("Entity with id " + id + " not found");
         }
-        throw new EntityNotFoundException("Entity with id " + id + " not found");
     }
 
     @Override
     public List<T> getAll() {
-        return repository.findAll();
+        try {
+            return repository.findAll();
+        } catch (NullPointerException e) {
+            throw new NullPointerException();
+        }
     }
 }

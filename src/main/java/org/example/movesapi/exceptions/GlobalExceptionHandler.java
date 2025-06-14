@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DependencyExistException.class)
     public ResponseEntity<Void> handleDependencyExist(DependencyExistException ex) {
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
     }
 
 

@@ -24,8 +24,9 @@ public class Genre {
     private Long id;
 
     @NotBlank(message = "Genre name is required")
-    private String genre;
+    private String name;
 
+    @Builder.Default
     @ManyToMany(mappedBy = "genres")
     @JsonIgnore
     private Set<Movie> movies = new HashSet<>();
