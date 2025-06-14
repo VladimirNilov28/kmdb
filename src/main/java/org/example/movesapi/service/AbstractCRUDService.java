@@ -52,22 +52,12 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
 
     @Override
     public void delete(ID id, boolean force) {
-        // 1) Если нет записи — 404
         if (!repository.existsById(id)) {
             throw new EntityNotFoundException("Movie not found: " + id);
         }
-        // 2) Если форс — удаляем несмотря ни на что
-        if (force) {
+        if (force || !isDependencyExist(id)) {
             repository.deleteById(id);
-            return;
-        }
-        // 3) Если зависимостей нет — удаляем
-        if (!isDependencyExist(id)) {
-            repository.deleteById(id);
-            return;
-        }
-        // 4) Иначе — конфликт
-        throw new DependencyExistException();
+        } else throw new DependencyExistException();
     }
     protected abstract boolean isDependencyExist(ID id);
 
