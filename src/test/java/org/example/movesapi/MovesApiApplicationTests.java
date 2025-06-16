@@ -6,6 +6,7 @@ import net.minidev.json.JSONArray;
 import org.example.movesapi.model.Actor;
 import org.example.movesapi.model.Genre;
 import org.example.movesapi.model.Movie;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +18,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,6 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("classpath:application-test.properties")
 class MovesApiApplicationTests {
+
+
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -197,12 +205,12 @@ class MovesApiApplicationTests {
 //        assertThat(repsonse.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
 //    }
 
-    @Test
-    void shouldFindMoviesByReleaseYear() {
-        ResponseEntity<String> response = restTemplate
-                .withBasicAuth("admin", "admin")
-                .getForEntity("")
-    }
+//    @Test
+//    void shouldFindMoviesByReleaseYear() {
+//        ResponseEntity<String> response = restTemplate
+//                .withBasicAuth("admin", "admin")
+//                .getForEntity("")
+//    }
 
     //Actor TESTS
 
