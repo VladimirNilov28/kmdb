@@ -2,6 +2,7 @@ package org.example.movesapi.controller;
 
 import jakarta.validation.Valid;
 import org.example.movesapi.service.CRUDService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -41,7 +42,7 @@ public abstract class BaseController<T, ID> {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable ID id,
-                                    @RequestParam(required = false ) Boolean force) {
+                                    @RequestParam(name = "force", required = false, defaultValue = "false") Boolean force) {
         service.delete(id, force);
         return ResponseEntity.noContent().build();
     }
@@ -52,8 +53,8 @@ public abstract class BaseController<T, ID> {
     }
 
     @GetMapping
-    public ResponseEntity<List<T>> getAll() {
-        return ResponseEntity.ok(service.getAll());
+    public ResponseEntity<List<T>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(service.getAll(pageable).getContent());
     }
 
 

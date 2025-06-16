@@ -25,11 +25,12 @@ public class Movie {
     private Long id;
 
     @NotBlank(message = "Move name is required")
-    private String movieName;
+    private String name;
 
     @NotNull
     private int releaseYear;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "movie_genres",
@@ -40,6 +41,7 @@ public class Movie {
     @JsonIgnoreProperties("movies")
     private Set<Genre> genres = new HashSet<>();
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "movie_actors",

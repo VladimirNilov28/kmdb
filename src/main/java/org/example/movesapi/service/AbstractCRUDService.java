@@ -3,12 +3,15 @@ package org.example.movesapi.service;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.movesapi.exceptions.DependencyExistException;
 import org.example.movesapi.model.Movie;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Map;
 
 @Transactional
@@ -26,13 +29,16 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
     }
     @Override
     public ID extractId(T entity) {
-        return getId(entity);
+        try {
+            return getId(entity);
+        } catch (NullPointerException e) {
+            throw new NullPointerException();
+        }
     }
 
     @Override
     public T update(ID id, Map<String, Object> fields) {
         T entity = repository.findById(id).orElse(null);
-
         if (entity != null) {
             fields.forEach((key, value) -> {
                 Field field = ReflectionUtils.findField(Movie.class, key);
@@ -42,20 +48,19 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
                 }
             });
             return repository.save(entity);
-        }
-        throw new EntityNotFoundException("Entity with id " + id + " not found");
-    }
-
-    //protected abstract void delete(ID id, boolean approve);
-    @Override
-    public void delete(ID id, boolean force) {
-        if (!force && repository.existsById(id)) {
-            throw new DependencyExistException();
-        }
-        if (!repository.existsById(id)) {
+        } else {
             throw new EntityNotFoundException("Entity with id " + id + " not found");
         }
-        repository.deleteById(id);
+    }
+
+    @Override
+    public void delete(ID id, boolean force) {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Movie not found: " + id);
+        }
+        if (force || !isDependencyExist(id)) {
+            repository.deleteById(id);
+        } else throw new DependencyExistException();
     }
     protected abstract boolean isDependencyExist(ID id);
 
@@ -64,12 +69,20 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
         T entity = repository.findById(id).orElse(null);
         if (entity != null) {
             return entity;
+        } else {
+            throw new EntityNotFoundException("Entity with id " + id + " not found");
         }
-        throw new EntityNotFoundException("Entity with id " + id + " not found");
     }
 
     @Override
-    public List<T> getAll() {
-        return repository.findAll();
+    public Page<T> getAll(Pageable pageable) {
+        return repository.findAll(PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                pageable.getSortOr(Sort.by(
+                        Sort.Order.asc("name").ignoreCase()
+                ))
+        ));
+
     }
 }

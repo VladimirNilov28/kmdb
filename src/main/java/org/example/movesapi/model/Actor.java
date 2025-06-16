@@ -30,6 +30,7 @@ public class Actor {
     @NotNull
     private LocalDate birthDate;
 
+    @Builder.Default
     @ManyToMany(mappedBy = "actors")
     @JsonIgnore
     private Set<Movie> movies = new HashSet<>();

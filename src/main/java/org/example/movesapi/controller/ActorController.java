@@ -1,4 +1,14 @@
 package org.example.movesapi.controller;
 
-public class ActorController {
+import org.example.movesapi.model.Actor;
+import org.example.movesapi.service.CRUDService;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/actors")
+public class ActorController extends BaseController<Actor, Long> {
+    public ActorController(CRUDService<Actor, Long> service) {
+        super(service);
+    }
 }

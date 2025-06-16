@@ -1,6 +1,8 @@
 package org.example.movesapi.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.Map;
 
 /**
@@ -15,6 +17,6 @@ public interface CRUDService<T, ID> {
     T update(ID id, Map<String, Object> entity);
     void delete(ID id, boolean force);
     T getById(ID id);
-    List<T> getAll();
+    Page<T> getAll(Pageable pageable);
     ID extractId(T entity);
 }
