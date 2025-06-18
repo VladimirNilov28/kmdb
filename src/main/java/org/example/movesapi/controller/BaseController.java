@@ -6,12 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
 
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public abstract class BaseController<T, ID> {
 
@@ -53,8 +53,8 @@ public abstract class BaseController<T, ID> {
     }
 
     @GetMapping
-    public ResponseEntity<List<T>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(service.getAll(pageable).getContent());
+    public ResponseEntity<List<T>> getAll(Pageable pageable, @RequestParam Optional<String> filter) {
+        return ResponseEntity.ok(service.getAll(pageable, ).getContent());
     }
 
 

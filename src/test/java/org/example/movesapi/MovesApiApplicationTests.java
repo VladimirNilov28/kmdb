@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -254,11 +255,30 @@ class MovesApiApplicationTests {
                 .getForEntity("/actors/101", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
+    @Test
+    void shouldFindMoviesByGenre() {
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/movies?genre=Comedy", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        DocumentContext ctx = JsonPath.parse(response.getBody());
+        List<Map<String, Object>> movies = ctx.read("$");
+        assertThat(movies)
+                .withFailMessage("At least one movie with Comedy genre is required")
+                .isNotEmpty();
+        for (int i = 0; i < movies.size(); i++) {
+            // Читаем список имён жанров у i-го фильма
+            List<String> genreNames = ctx.read(String.format("$[%d].genres[*].name", i));
+            assertThat(genreNames)
+                    .withFailMessage("Фильм под индексом %d не содержит жанр Comedy: %s", i, genreNames)
+                    .anyMatch(name -> name.equalsIgnoreCase("Comedy"));
+        }
+    }
 
 //    @Test
 //    @DirtiesContext
 //    void shouldCreateActorWith201andLocationHeader
-
 
 
 

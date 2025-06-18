@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Transactional
 public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
@@ -75,7 +77,10 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
     }
 
     @Override
-    public Page<T> getAll(Pageable pageable) {
+    public Page<T> getAll(Pageable pageable, Optional<List<String>> filter) {
+        if (filter.isPresent()) {
+            return filter(filter.get());
+        }
         return repository.findAll(PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
@@ -85,4 +90,7 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
         ));
 
     }
+    protected abstract Page<T> filter(List<String> filter);
+
+
 }

@@ -23,6 +23,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, PagingAndSo
 
     Page<Movie> findByActors(Set<Actor> actor, Pageable pageable);
 
+    Page<Movie> findByGenres(Set<Genre> genre, Pageable pageable);
+
     /**
      * Check whether a Movie has any Actor or Genre relationships.
      * ----------------------------------------------------------------------
