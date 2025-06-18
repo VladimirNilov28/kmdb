@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.CONFLICT)
 public class DependencyExistException extends RuntimeException {
-    public DependencyExistException() {
-        super("Cannot delete: dependencies exist");
+    public DependencyExistException(String message) {
+        super(message);
     }
 }

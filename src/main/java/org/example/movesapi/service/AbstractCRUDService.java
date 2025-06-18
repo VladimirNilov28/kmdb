@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,6 +20,7 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
 
     protected final JpaRepository<T, ID> repository;
     protected abstract ID getId(T entity);
+
     public AbstractCRUDService(JpaRepository<T, ID> repository) {
         this.repository = repository;
     }
@@ -39,17 +39,17 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
     }
 
     @Override
-    public T update(ID id, Map<String, Object> fields) {
+    public void update(ID id, Map<String, Object> fields) {
         T entity = repository.findById(id).orElse(null);
         if (entity != null) {
             fields.forEach((key, value) -> {
-                Field field = ReflectionUtils.findField(Movie.class, key);
+                Field field = ReflectionUtils.findField(entity.getClass(), key);
                 if (field != null) {
                     field.setAccessible(true);
                     ReflectionUtils.setField(field, entity, value);
                 }
             });
-            return repository.save(entity);
+            repository.save(entity);
         } else {
             throw new EntityNotFoundException("Entity with id " + id + " not found");
         }
@@ -62,9 +62,11 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
         }
         if (force || !isDependencyExist(id)) {
             repository.deleteById(id);
-        } else throw new DependencyExistException();
+        } else throw new DependencyExistException("Cannot delete genre" + getName(id) + "because it has" + getDependencyCount(id) + "associations");
     }
     protected abstract boolean isDependencyExist(ID id);
+    protected abstract String getName(ID id);
+    protected abstract int getDependencyCount(ID id);
 
     @Override
     public T getById(ID id) {
@@ -77,9 +79,9 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
     }
 
     @Override
-    public Page<T> getAll(Pageable pageable, Optional<List<String>> filter) {
+    public Page<T> getAll(Pageable pageable, Optional<String> filter) {
         if (filter.isPresent()) {
-            return filter(filter.get());
+            return filter(filter.get(), pageable);
         }
         return repository.findAll(PageRequest.of(
                 pageable.getPageNumber(),
@@ -88,9 +90,8 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
                         Sort.Order.asc("name").ignoreCase()
                 ))
         ));
-
     }
-    protected abstract Page<T> filter(List<String> filter);
+    protected abstract Page<T> filter(String filter, Pageable pageable);
 
 
 }

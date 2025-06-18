@@ -1,10 +1,15 @@
 package org.example.movesapi.repository;
 
 import org.example.movesapi.model.Actor;
+import org.example.movesapi.model.Movie;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+
+import java.util.Set;
 
 public interface ActorRepository extends JpaRepository<Actor, Long>, PagingAndSortingRepository<Actor, Long> {
     Actor findByName(String name);
@@ -32,4 +37,15 @@ public interface ActorRepository extends JpaRepository<Actor, Long>, PagingAndSo
         GROUP BY a.id
         """)
     boolean isDependencyExists(@Param("actorId") Long actorId);
+
+    @Query("""
+        SELECT COUNT(m)
+        FROM Actor a
+        LEFT JOIN a.movies m
+        WHERE a.id = :actorId
+        GROUP BY a.id
+        """)
+    int getDependencyCount(@Param("actorId") Long actorId);
+
+    Page<Actor> findByMovies(Set<Movie> movies, Pageable pageable);
 }

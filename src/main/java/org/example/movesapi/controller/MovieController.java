@@ -1,7 +1,9 @@
 package org.example.movesapi.controller;
 
+import org.apache.coyote.BadRequestException;
 import org.example.movesapi.model.Movie;
 import org.example.movesapi.service.CRUDService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -13,6 +15,10 @@ public class MovieController extends BaseController<Movie, Long> {
         super(service);
     }
 
+    @GetMapping("/search")
+    private ResponseEntity<Movie> search(@RequestParam String title) throws BadRequestException {
+        return ResponseEntity.ok(service.findMovie(title));
+    }
 
 //    @DeleteMapping("/{id}")
 //    public ResponseEntity<Void> delete(@PathVariable Long id,

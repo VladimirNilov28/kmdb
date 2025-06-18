@@ -54,7 +54,7 @@ public abstract class BaseController<T, ID> {
 
     @GetMapping
     public ResponseEntity<List<T>> getAll(Pageable pageable, @RequestParam Optional<String> filter) {
-        return ResponseEntity.ok(service.getAll(pageable, ).getContent());
+        return ResponseEntity.ok(service.getAll(pageable, filter).getContent());
     }
 
 

@@ -6,7 +6,6 @@ import net.minidev.json.JSONArray;
 import org.example.movesapi.model.Actor;
 import org.example.movesapi.model.Genre;
 import org.example.movesapi.model.Movie;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,14 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -188,8 +181,6 @@ class MovesApiApplicationTests {
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
-    //TODO тесть на удаление фильма с пустыми связями
-
     @Test
     void shouldNotDeleteMovieThatNotExist() {
         ResponseEntity<Void> response = restTemplate
@@ -259,26 +250,330 @@ class MovesApiApplicationTests {
     void shouldFindMoviesByGenre() {
         ResponseEntity<String> response = restTemplate
                 .withBasicAuth("admin", "admin")
-                .getForEntity("/movies?genre=Comedy", String.class);
+                .getForEntity("/movies?filter=genre:Crime", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         DocumentContext ctx = JsonPath.parse(response.getBody());
         List<Map<String, Object>> movies = ctx.read("$");
         assertThat(movies)
-                .withFailMessage("At least one movie with Comedy genre is required")
+                .withFailMessage("At least one movie with Crime genre is required")
                 .isNotEmpty();
         for (int i = 0; i < movies.size(); i++) {
             // Читаем список имён жанров у i-го фильма
             List<String> genreNames = ctx.read(String.format("$[%d].genres[*].name", i));
             assertThat(genreNames)
                     .withFailMessage("Фильм под индексом %d не содержит жанр Comedy: %s", i, genreNames)
-                    .anyMatch(name -> name.equalsIgnoreCase("Comedy"));
+                    .anyMatch(name -> name.equalsIgnoreCase("Crime"));
         }
     }
 
-//    @Test
-//    @DirtiesContext
-//    void shouldCreateActorWith201andLocationHeader
+    @Test
+    void shouldFindMoviesByReleaseYear() {
+        // Фильтруем фильмы по году 1999
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/movies?filter=releaseYear:1999", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        DocumentContext ctx = JsonPath.parse(response.getBody());
+        List<Map<String, Object>> movies = ctx.read("$");
+        assertThat(movies)
+                .withFailMessage("Должен быть хотя бы один фильм за 1999 год")
+                .isNotEmpty();
+
+        for (int i = 0; i < movies.size(); i++) {
+            Integer year = ctx.read(String.format("$[%d].releaseYear", i));
+            assertThat(year)
+                    .withFailMessage("Фильм под индексом %d имеет неверный год выпуска: %d", i, year)
+                    .isEqualTo(1999);
+        }
+    }
+
+    @Test
+    void shouldFindMoviesByActor() {
+        // Фильтруем фильмы по актёру Keanu Reeves
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/movies?filter=actor:Keanu Reeves", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        DocumentContext ctx = JsonPath.parse(response.getBody());
+        List<Map<String, Object>> movies = ctx.read("$");
+        assertThat(movies)
+                .withFailMessage("Должен быть хотя бы один фильм с Keanu Reeves")
+                .isNotEmpty();
+
+        for (int i = 0; i < movies.size(); i++) {
+            List<String> actorNames = ctx.read(String.format("$[%d].actors[*].name", i));
+            assertThat(actorNames)
+                    .withFailMessage("Фильм под индексом %d не содержит актёра Keanu Reeves: %s", i, actorNames)
+                    .anyMatch(name -> name.equalsIgnoreCase("Keanu Reeves"));
+        }
+    }
+
+
+    @Test
+    void shouldFindMovieUsingSearch() {
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/movies/search?title=The Matrix", String.class);
+    }
+
+    // Actors
+
+    @Test
+    void shouldCreateActorWith201andLocationHeader() {
+        Map<String, Object> actor = Map.of(
+                "name", "Test Actor",
+                "birthDate", "2000-01-01"
+        );
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .postForEntity("/actors", actor, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getHeaders().getLocation())
+                .withFailMessage("Location header must be present")
+                .isNotNull();
+    }
+
+    @Test
+    void shouldRejectCreateActorWithInvalidData() {
+        // Пустое имя и отсутствие даты рождения
+        Map<String, Object> invalidActor = Map.of(
+                "name", "",
+                "birthDate", ""
+        );
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(invalidActor);
+
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .postForEntity("/actors", request, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).contains("name", "birthDate"); // если возвращается сообщение об ошибке
+    }
+
+    @Test
+    @DirtiesContext
+    void shouldPatchActorPartiallyAndReturn200() {
+        // Обновляем имя существующего актёра с id = 1
+        Map<String, Object> update = Map.of("name", "Updated Name");
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(update);
+
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/actors/1", HttpMethod.PATCH, entity, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        // Проверим, что имя действительно обновилось
+        ResponseEntity<Actor> getResponse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/actors/1", Actor.class);
+
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(getResponse.getBody()).isNotNull();
+        assertThat(getResponse.getBody().getName()).isEqualTo("Updated Name");
+    }
+
+
+    @Test
+    void shouldReturn404WhenPatchNonexistentActor() {
+        Map<String, Object> update = Map.of("name", "No One");
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(update);
+
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/actors/9999", HttpMethod.PATCH, entity, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+@Test
+void shouldDeleteActorWith204() {
+    // 1. Создать временного актёра
+    Map<String, Object> actor = Map.of(
+            "name", "Temp Actor",
+            "birthDate", "1990-01-01"
+    );
+    ResponseEntity<Void> createResponse = restTemplate
+            .withBasicAuth("admin", "admin")
+            .postForEntity("/actors", actor, Void.class);
+
+    // 2. Вытащить ID из Location
+    String location = createResponse.getHeaders().getLocation().toString();
+    Long id = Long.valueOf(location.substring(location.lastIndexOf("/") + 1));
+
+    // 3. Удалить
+    ResponseEntity<Void> deleteResponse = restTemplate
+            .withBasicAuth("admin", "admin")
+            .exchange("/actors/" + id, HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+
+    assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+}
+
+    @Test
+    void shouldReturn404WhenDeleteNonexistentActor() {
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/actors/9999", HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldForceDeleteActorWith204() {
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/actors/1?force=true", HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+
+// Genres
+
+
+    @Test
+    void shouldReturnGenresListWhenExists() {
+        // Предварительно заполнить жанры
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/genres", String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        DocumentContext ctx = JsonPath.parse(response.getBody());
+        List<Map<String, Object>> list = ctx.read("$");
+        assertThat(list)
+                .withFailMessage("Genres list must not be empty")
+                .isNotEmpty();
+    }
+
+    @Test
+    void shouldReturnGenreByIdWith200andCorrectGenre() {
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/genres/5", String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        DocumentContext ctx = JsonPath.parse(response.getBody());
+        String name = ctx.read("$.name");
+        assertThat(name).isEqualTo("Crime");
+    }
+
+    @Test
+    void shouldReturn404WhenGetNonexistentGenre() {
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/genres/9999", Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldCreateGenreWith201andLocationHeader() {
+        Map<String, Object> genre = Map.of("name", "NewGenre");
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .postForEntity("/genres", genre, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getHeaders().getLocation())
+                .withFailMessage("Location header must be present")
+                .isNotNull();
+    }
+
+    @Test
+    void shouldRejectCreateGenreWithInvalidData() {
+        Map<String, Object> invalid = Map.of("name", "");
+        ResponseEntity<String> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .postForEntity("/genres", invalid, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldPatchGenrePartiallyAndReturn200() {
+        // Обновляем название жанра с id = 3
+        Map<String, Object> update = Map.of("name", "UpdatedGenre");
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(update);
+
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/genres/3", HttpMethod.PATCH, entity, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        // Проверим, что название действительно обновилось
+        ResponseEntity<Genre> getResponse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/genres/3", Genre.class);
+
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(getResponse.getBody()).isNotNull();
+        assertThat(getResponse.getBody().getName()).isEqualTo("UpdatedGenre");
+    }
+
+
+    @Test
+    void shouldReturn404WhenPatchNonexistentGenre() {
+        Map<String, Object> update = Map.of("name", "NoGenre");
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(update);
+
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/genres/9999", HttpMethod.PATCH, entity, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldDeleteGenreWith204() {
+        // 1. Создать временный жанр
+        Map<String, Object> genre = Map.of("name", "TempGenre");
+        ResponseEntity<Void> createResponse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .postForEntity("/genres", genre, Void.class);
+
+        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        String location = createResponse.getHeaders().getLocation().toString();
+        Long id = Long.valueOf(location.substring(location.lastIndexOf("/") + 1));
+
+        // 2. Удалить
+        ResponseEntity<Void> deleteResponse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/genres/" + id, HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+
+        assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        // 3. Проверить, что жанр больше не существует
+        ResponseEntity<String> getResponse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .getForEntity("/genres/" + id, String.class);
+
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldReturn404WhenDeleteNonexistentGenre() {
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/genres/9999", HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldForceDeleteGenreWith204() {
+        ResponseEntity<Void> response = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/genres/5?force=true", HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
 
 
 

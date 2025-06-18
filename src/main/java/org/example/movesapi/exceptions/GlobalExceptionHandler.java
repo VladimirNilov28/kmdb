@@ -17,24 +17,29 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Void> handleValidationException(MethodArgumentNotValidException ex) {
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Void> handleNotFound(EntityNotFoundException ex) {
+    public ResponseEntity<Void> handleNotFound() {
         return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<Void> handleNullPointer(NullPointerException ex) {
+    public ResponseEntity<Void> handleNullPointer() {
         return ResponseEntity.notFound().build();
     }
 
 
     @ExceptionHandler(DependencyExistException.class)
-    public ResponseEntity<Void> handleDependencyExist(DependencyExistException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+    public ResponseEntity<String> handleDependencyExist(DependencyExistException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
 

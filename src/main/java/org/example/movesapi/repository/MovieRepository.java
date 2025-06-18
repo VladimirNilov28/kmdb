@@ -10,20 +10,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 
 public interface MovieRepository extends JpaRepository<Movie, Long>, PagingAndSortingRepository<Movie, Long> {
-    Page<Movie> findAllByActorsId(Long actorId, Pageable pageable);
 
-    Page<Movie> findByGenresContaining(Genre genre, Pageable pageable);
+    Page<Movie> findByGenres(Set<Genre> genres,  Pageable pageable);
 
     Page<Movie> findByReleaseYear(int releaseYear, Pageable pageable);
 
-    Page<Movie> findByActors(Set<Actor> actor, Pageable pageable);
-
-    Page<Movie> findByGenres(Set<Genre> genre, Pageable pageable);
+    Page<Movie> findByActors(Set<Actor> actors, Pageable pageable);
 
     /**
      * Check whether a Movie has any Actor or Genre relationships.
@@ -51,5 +50,17 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, PagingAndSo
     """)
     boolean isDependencyExist(@Param("movieId") Long movieId);
 
+    @Query("""
+        SELECT COALESCE(COUNT(DISTINCT a), 0) + COALESCE(COUNT(DISTINCT g), 0)
+        FROM Movie m
+        LEFT JOIN m.actors a
+        LEFT JOIN m.genres g
+        WHERE m.id = :movieId
+        GROUP BY m.id
+    """)
+    int getDependencyCount(@Param("movieId") Long movieId);
+
     List<Movie> id(Long id);
+
+    Movie findByName(String name);
 }

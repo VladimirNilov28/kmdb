@@ -34,4 +34,13 @@ public interface GenreRepository extends JpaRepository<Genre, Long>, PagingAndSo
         GROUP BY g.id
         """)
     boolean isDependencyExists(@Param("genreId") Long genreId);
+
+    @Query("""
+        SELECT COUNT(m)
+        FROM Genre g
+        LEFT JOIN g.movies m
+        WHERE g.id = :genreId
+        GROUP BY g.id
+        """)
+    int getDependencyCount(@Param("genreId") Long genreId);
 }
