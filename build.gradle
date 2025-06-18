@@ -2,10 +2,6 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
-
-    // указываем, только если вам действительно нужны Gradle-таски Hibernate
-    // id 'org.hibernate.orm' version '7.0.0.Final'
-
     id 'com.github.gmazzo.sqlite' version '0.2'
 }
 
@@ -22,13 +18,6 @@ repositories {
     mavenCentral()
 }
 
-dependencyManagement {
-    // Только если вы хотите явно перейти на Hibernate 7:
-    // imports {
-    //     mavenBom "org.hibernate:hibernate-bom:7.0.0.Final"
-    // }
-}
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -36,9 +25,7 @@ dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.6.15.Final'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-
-    // не подключаем плагин как зависимость!
-    // implementation("org.hibernate.orm:org.hibernate.orm.gradle.plugin:7.0.0.Final")
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
