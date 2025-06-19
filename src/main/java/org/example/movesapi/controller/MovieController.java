@@ -6,6 +6,14 @@ import org.example.movesapi.service.CRUDService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST controller for managing {@link Movie} entities via the /movies endpoint.
+ * <p>
+ * Inherits all basic CRUD operations from {@link BaseController}.
+ * <p>
+ * Includes a custom search endpoint for retrieving a movie by its title.
+ */
+
 
 @RestController
 @RequestMapping("/movies")
@@ -15,70 +23,15 @@ public class MovieController extends BaseController<Movie, Long> {
         super(service);
     }
 
+    /**
+     * Custom GET endpoint for retrieving a movie by its title.
+     *
+     * @param title the title of the movie to search for
+     * @return the movie matching the title, if found
+     * @throws BadRequestException if the title is invalid or not found
+     */
     @GetMapping("/search")
     private ResponseEntity<Movie> search(@RequestParam String title) throws BadRequestException {
         return ResponseEntity.ok(service.findMovie(title));
     }
-
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> delete(@PathVariable Long id,
-//                                    @RequestParam(required = false ) boolean force) {
-//        service.
-//        return ResponseEntity.noContent().build();
-//    }
-
-//    @GetMapping
-//    private ResponseEntity<List<Movie>> findAll() {
-//        List<Movie> movies = movieRepository.findAll();
-//        return ResponseEntity.ok(movies);
-//    }
-//
-//    @GetMapping("/{id}")
-//    private ResponseEntity<Movie> findById(@PathVariable Long id) {
-//        Movie movie = movieRepository.findById(id).orElse(null);
-//        if (movie == null) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        return ResponseEntity.ok(movie);
-//    }
-//
-//    @PostMapping
-//    private ResponseEntity<Void> addMovie(@RequestBody @Valid Movie movie, UriComponentsBuilder ucb) {
-//        Movie savedMovie = movieRepository.save(movie);
-//        URI locationOfNewMovie = ucb
-//                .path("/movies/{id}")
-//                .buildAndExpand(savedMovie.getId())
-//                .toUri();
-//        return ResponseEntity.created(locationOfNewMovie).build();
-//    }
-//
-//    @PatchMapping("/{id}")
-//    private ResponseEntity<Void> updateMovie(@PathVariable Long id, @RequestBody Map<String, Object> fields) {
-//        Movie movie = movieRepository.findById(id).orElse(null);
-//
-//        if (movie != null) {
-//            fields.forEach((key, value) -> {
-//                Field field = ReflectionUtils.findField(Movie.class, key);
-//                if (field != null) {
-//                    field.setAccessible(true);
-//                    ReflectionUtils.setField(field, movie, value);
-//                }
-//            });
-//            movieRepository.save(movie);
-//            return ResponseEntity.ok().build();
-//        }
-//        throw new EntityNotFoundException("Movie with id " + id + " not found");
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    private ResponseEntity<Void> deleteMovie(@PathVariable Long id,
-//                                             @RequestParam(required = false ) boolean force) {
-//        boolean deleteApprove = (force || movieRepository.isDependencyExist(id));
-//        if (movieRepository.existsById(id)) {
-//            movieRepository.deleteById(id);
-//            return ResponseEntity.noContent().build();
-//        }
-//        return ResponseEntity.notFound().build();
-//    }
-
 }

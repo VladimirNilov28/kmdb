@@ -13,11 +13,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Universal generic REST controller for basic CRUD operations.
+ * <p>
+ * Supports standard REST methods: {@code GET}, {@code POST}, {@code PATCH}, {@code DELETE}
+ * @param <T> the entity type (e.g. Movie, Actor, Genre)
+ * @param <ID> the type of the entity's identifier (e.g. Long, UUID)
+ */
+
 public abstract class BaseController<T, ID> {
 
+    // Interface that defines CRUD operations which must be implemented by any service class.
     protected final CRUDService<T, ID> service;
-    //protected abstract ID getId(T entity);
 
+    // Injects a service that contains business logic for the entity.
     public BaseController(CRUDService<T, ID> service) {
         this.service = service;
     }
@@ -26,6 +35,7 @@ public abstract class BaseController<T, ID> {
     public ResponseEntity<Void> create(@RequestBody @Valid T entity) {
         T newEntity = service.create(entity);
         ID id = service.extractId(newEntity);
+        // Build an uri to new entity in database
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")

@@ -9,6 +9,24 @@ import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Entity representing a movie with its basic data and relationships.
+ * Contains information such as the movie name, release year, and many-to-many relationships
+ * with {@code Genre} and {@code Actor} entities. This entity owns both relationships.
+ * <p>
+ * Uses Lombok to reduce boilerplate:
+ * <ul>
+ *   <li>{@code @Getter} – generates getters for all fields</li>
+ *   <li>{@code @Setter} – generates setters for all fields</li>
+ *   <li>{@code @NoArgsConstructor} – generates a no-args constructor</li>
+ *   <li>{@code @AllArgsConstructor} – generates a constructor with all fields</li>
+ *   <li>{@code @Builder} – provides a fluent builder API for object creation</li>
+ *   <li>{@code @EqualsAndHashCode(of = "id")} – equality based only on ID</li>
+ *   <li>{@code @ToString(exclude = {...})} – prevents recursive output in logs</li>
+ * </ul>
+ */
+
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,7 +34,6 @@ import java.util.Set;
 @Builder
 @EqualsAndHashCode(of = "id")       // только по ID
 @ToString(exclude = {"actors", "genres"})     // исключи рекурсивные поля
-
 @Entity
 public class Movie {
 

@@ -17,8 +17,14 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Loads sample data into the database on application startup,
+ * but only when the active profile is not "test".
+ * <p>
+ * Reads a JSON file from the classpath and populates the Genre, Actor, and Movie tables.
+ */
 @Component
-@Profile("!test")
+@Profile("!test") // Exclude from test profile to avoid polluting test DB
 public class DataLoader implements CommandLineRunner {
 
     private final GenreRepository genreRepo;
@@ -26,6 +32,8 @@ public class DataLoader implements CommandLineRunner {
     private final MovieRepository movieRepo;
     private final ObjectMapper mapper;
 
+
+    //Constructs the DataLoader with all necessary repositories and a JSON parser.
     public DataLoader(GenreRepository genreRepo,
                       ActorRepository actorRepo,
                       MovieRepository movieRepo,
@@ -36,6 +44,13 @@ public class DataLoader implements CommandLineRunner {
         this.mapper = mapper;
     }
 
+    /**
+     * Loads sample data into the database from sample_movies_data.json.
+     * Skips loading if movies already exist.
+     *
+     * @param args command-line arguments (ignored)
+     * @throws Exception if file reading or parsing fails
+     */
     @Override
     public void run(String... args) throws Exception {
         if (movieRepo.count() > 0) {
@@ -43,9 +58,11 @@ public class DataLoader implements CommandLineRunner {
             return;
         }
 
+        // Load the JSON file from resources
         InputStream is = new ClassPathResource("sample_movies_data.json").getInputStream();
         JsonNode root = mapper.readTree(is);
 
+        // Load genres and map JSON ids to saved DB entities
         Map<Long, Genre> genreMap = new HashMap<>();
         for (JsonNode g : root.get("genres")) {
             long jsonId = g.get("id").asLong();
@@ -56,6 +73,7 @@ public class DataLoader implements CommandLineRunner {
             genreMap.put(jsonId, saved);
         }
 
+        // Load actors and map JSON ids to saved DB entities
         Map<Long, Actor> actorMap = new HashMap<>();
         for (JsonNode a : root.get("actors")) {
             long jsonId = a.get("id").asLong();
@@ -67,28 +85,30 @@ public class DataLoader implements CommandLineRunner {
             actorMap.put(jsonId, saved);
         }
 
-        // 3) Теперь создаём фильмы, подхватывая уже сохранённые объекты
+        // Load movies and resolve actor/genre relationships
         List<Movie> movies = new ArrayList<>();
         for (JsonNode m : root.get("movies")) {
-            // подтягиваем Genre по JSON-id
             Set<Genre> genres = new HashSet<>();
             for (JsonNode gj : m.get("genres")) {
                 genres.add(genreMap.get(gj.get("id").asLong()));
             }
-            // подтягиваем Actor по JSON-id
+
             Set<Actor> actors = new HashSet<>();
             for (JsonNode aj : m.get("actors")) {
                 actors.add(actorMap.get(aj.get("id").asLong()));
             }
-            // строим и сохраняем Movie (без id)
+
             Movie movie = Movie.builder()
                     .name(m.get("name").asText())
                     .releaseYear(m.get("releaseYear").asInt())
                     .genres(genres)
                     .actors(actors)
                     .build();
+
             movies.add(movie);
         }
+
+        // Save all movies with their relationships
         movieRepo.saveAll(movies);
 
         System.out.println("✅ Loaded " + movies.size() + " movies.");

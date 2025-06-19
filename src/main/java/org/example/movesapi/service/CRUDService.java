@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Here is a interface for all our CRUD operations
+ * Here is an interface for all our CRUD operations
  * It describes all our base methods
  * @param <T> Entity
  * @param <ID> ID of out entity

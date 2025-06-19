@@ -25,6 +25,34 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * 📦 Integration Test Suite for the Movies API
+ * <p>
+ * Covers all REST functionality for:
+ * <ul>
+ *     <li>🎬 <b>Movies</b>: CRUD, filtering by genre/year/actor, search by title</li>
+ *     <li>🧑‍🎤 <b>Actors</b>: CRUD, pagination, partial updates</li>
+ *     <li>🎭 <b>Genres</b>: CRUD, deletion with dependency check</li>
+ * </ul>
+ *
+ * 🧪 Features:
+ * <ul>
+ *     <li>Runs with {@code @SpringBootTest} to test the full context</li>
+ *     <li>🔐 Authenticated via {@code admin/admin} in every request</li>
+ *     <li>🔍 Uses {@link JsonPath} to parse and validate JSON responses</li>
+ *     <li>♻️ Uses {@code @DirtiesContext} for isolated stateful tests</li>
+ * </ul>
+ *
+ * Note: This class ensures that your API behaves as expected from an external consumer’s perspective.
+ *
+ * @author Vladimir
+ * @see org.example.movesapi.model.Movie
+ * @see org.example.movesapi.model.Actor
+ * @see org.example.movesapi.model.Genre
+ * @see org.springframework.boot.test.web.client.TestRestTemplate
+ * @see org.junit.jupiter.api.Test
+ */
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("classpath:application-test.properties")
 class MovesApiApplicationTests {

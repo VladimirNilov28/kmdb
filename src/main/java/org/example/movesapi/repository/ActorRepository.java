@@ -15,16 +15,14 @@ public interface ActorRepository extends JpaRepository<Actor, Long>, PagingAndSo
     Actor findByName(String name);
     /**
      * Check whether an Actor is linked to at least one Movie.
-     * ----------------------------------------------------------------------
-     * This query performs a left join between Actor and its movies collection.
+     * <p>
+     * This query performs a left join between Actor and its movies' collection.
      * It counts how many Movie entities are associated with the given Actor ID.
      * GROUP BY on the Actor ID ensures correct aggregation.
      * The CASE expression converts the count into a boolean result:
      * true if the count is greater than zero, false otherwise.
-     * ----------------------------------------------------------------------
      * @param actorId the primary key of the Actor to check
-     * @return true if there is at least one Movie linked to this Actor;
-     *         false if no associations exist or if the Actor does not exist
+     * @return true if there is at least one Movie linked to this Actor and false if no associations exist or if the Actor does not exist
      */
     @Query("""
         SELECT CASE
@@ -37,6 +35,12 @@ public interface ActorRepository extends JpaRepository<Actor, Long>, PagingAndSo
         GROUP BY a.id
         """)
     boolean isDependencyExists(@Param("actorId") Long actorId);
+
+    /**
+     * It is similar to previous, but it just counts amount of dependencies
+     * @param actorId the primary key of the Actor to check
+     * @return count of dependencies
+     */
 
     @Query("""
         SELECT COUNT(m)

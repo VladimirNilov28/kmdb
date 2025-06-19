@@ -50,6 +50,12 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, PagingAndSo
     """)
     boolean isDependencyExist(@Param("movieId") Long movieId);
 
+    /**
+     * It is similar to previous, but it just counts sum of amount of dependencies
+     * @param movieId the primary key of the Movie to check
+     * @return count of dependencies
+     */
+
     @Query("""
         SELECT COALESCE(COUNT(DISTINCT a), 0) + COALESCE(COUNT(DISTINCT g), 0)
         FROM Movie m

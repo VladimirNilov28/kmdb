@@ -35,6 +35,11 @@ public interface GenreRepository extends JpaRepository<Genre, Long>, PagingAndSo
         """)
     boolean isDependencyExists(@Param("genreId") Long genreId);
 
+    /**
+     * It is similar to previous, but it just counts amount of dependencies
+     * @param genreId the primary key of the Genre to check
+     * @return count of dependencies
+     */
     @Query("""
         SELECT COUNT(m)
         FROM Genre g
