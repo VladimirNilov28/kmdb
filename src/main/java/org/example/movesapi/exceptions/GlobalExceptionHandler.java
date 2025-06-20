@@ -34,8 +34,8 @@ public class GlobalExceptionHandler {
      * Returns HTTP 404 Not Found.
      */
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Void> handleNotFound() {
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<String> handleNotFound(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     /**

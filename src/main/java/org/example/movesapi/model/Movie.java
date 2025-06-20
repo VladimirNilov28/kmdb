@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.validator.constraints.Range;
 
+import java.time.Year;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,6 +47,7 @@ public class Movie {
     private String name;
 
     @NotNull
+    @Range(min = 1895, max = 2040)
     private int releaseYear;
 
     @Builder.Default

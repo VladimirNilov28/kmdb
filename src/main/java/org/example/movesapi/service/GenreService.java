@@ -3,12 +3,14 @@ package org.example.movesapi.service;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.example.movesapi.model.Genre;
+import org.example.movesapi.model.Movie;
 import org.example.movesapi.repository.GenreRepository;
+import org.example.movesapi.repository.MovieRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service class for handling Genre-specific logic.
@@ -21,13 +23,15 @@ import java.util.Optional;
 public class GenreService extends AbstractCRUDService<Genre, Long> {
 
     private final GenreRepository repository;
+    private final MovieRepository movieRepository;
 
     /**
      * Constructs the GenreService with the provided repository.
      */
-    public GenreService(GenreRepository repository) {
+    public GenreService(GenreRepository repository, MovieRepository movieRepository) {
         super(repository);
         this.repository = repository;
+        this.movieRepository = movieRepository;
     }
 
     /**
@@ -86,6 +90,27 @@ public class GenreService extends AbstractCRUDService<Genre, Long> {
     @Override
     protected Long getId(Genre entity) {
         return entity.getId();
+    }
+
+    /**
+     * Checks whether movies referenced in the new Genre entity
+     * actually exist in the database.
+     * <p>
+     * Throws {@link EntityNotFoundException} if at least one of them does not exist.
+     * This prevents the creation of Genre with broken many-to-many relationships.
+     *
+     * @param entity the Movie entity to validate
+     */
+    @Override
+    protected void entityValidator(Genre entity) {
+        Set<Movie> movies = entity.getMovies();
+        if(movies != null && !movies.isEmpty()) {
+            movies.forEach(movie -> {
+                if(!movieRepository.existsById(movie.getId())) {
+                    throw new EntityNotFoundException("Movie with id " + movie.getId() + " not found");
+                }
+            });
+        }
     }
 }
 

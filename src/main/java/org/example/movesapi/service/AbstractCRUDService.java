@@ -2,7 +2,6 @@ package org.example.movesapi.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.example.movesapi.exceptions.DependencyExistException;
-import org.example.movesapi.model.Movie;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -43,8 +42,10 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
      */
     @Override
     public T create(T entity) {
+        entityValidator(entity);
         return repository.save(entity);
     }
+    protected abstract void entityValidator(T entity);
 
     /**
      * Extracts the ID from a given entity using the implemented getId() method.
@@ -95,7 +96,7 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
         }
         if (force || !isDependencyExist(id)) {
             repository.deleteById(id);
-        } else throw new DependencyExistException("Cannot delete genre" + getName(id) + "because it has" + getDependencyCount(id) + "associations");
+        } else throw new DependencyExistException("Cannot delete " + getName(id) + " because it has " + getDependencyCount(id) + " associations");
     }
 
     /**

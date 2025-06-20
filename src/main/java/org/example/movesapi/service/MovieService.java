@@ -165,6 +165,35 @@ public class MovieService extends AbstractCRUDService<Movie, Long> {
                 ))
         );
     }
+
+    /**
+     * Checks whether all actors and genres referenced in the new Movie entity
+     * actually exist in the database.
+     * <p>
+     * Throws {@link EntityNotFoundException} if at least one of them does not exist.
+     * This prevents the creation of Movies with broken many-to-many relationships.
+     *
+     * @param entity the Movie entity to validate
+     */
+    @Override
+    protected void entityValidator(Movie entity) {
+        Set<Actor> actors = entity.getActors();
+        if (actors != null && !actors.isEmpty()) {
+            actors.forEach(actor -> {
+                if(!actorRepository.existsById(actor.getId())) {
+                    throw new EntityNotFoundException("Actor with id " + actor.getId() + " not found");
+                }
+            });
+        }
+        Set<Genre> genres = entity.getGenres();
+        if (genres != null && !genres.isEmpty()) {
+            genres.forEach(genre -> {
+                if(!genreRepository.existsById(genre.getId())) {
+                    throw new EntityNotFoundException("Genre with id " + genre.getId() + " not found");
+                }
+            });
+        }
+    }
 }
 
 /*
