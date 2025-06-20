@@ -25,17 +25,15 @@ public class MovieService extends AbstractCRUDService<Movie, Long> {
     private final MovieRepository repository;
     private final GenreRepository genreRepository;
     private final ActorRepository actorRepository;
-    private final MovieRepository movieRepository;
 
     /**
      * Constructs the MovieService with all required repositories.
      */
-    public MovieService(MovieRepository repository, GenreRepository genreRepository, ActorRepository actorRepository, MovieRepository movieRepository) {
+    public MovieService(MovieRepository repository, GenreRepository genreRepository, ActorRepository actorRepository) {
         super(repository);
         this.repository = repository;
         this.genreRepository = genreRepository;
         this.actorRepository = actorRepository;
-        this.movieRepository = movieRepository;
     }
 
     /**
@@ -109,9 +107,9 @@ public class MovieService extends AbstractCRUDService<Movie, Long> {
         String value = parts[1].trim();
 
         return switch (key) {
-            case "genre" -> repository.findByGenres(getGenres(value), getPageable(pageable));
+            case "genre" -> repository.findByGenres(getGenres(value), getGenres(value).size(), getPageable(pageable));
             case "releaseYear" -> repository.findByReleaseYear(Integer.parseInt(value), getPageable(pageable));
-            case "actor" -> repository.findByActors(getActors(value), getPageable(pageable));
+            case "actor" -> repository.findByActors(getActors(value), getActors(value).size(), getPageable(pageable));
             default -> throw new IllegalArgumentException("Filter key: " + key + " not supported");
         };
     }

@@ -1,5 +1,6 @@
 package org.example.movesapi.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.example.movesapi.model.Movie;
 import org.example.movesapi.service.CRUDService;

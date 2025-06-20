@@ -32,7 +32,7 @@ public abstract class BaseController<T, ID> {
     }
 
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody @Valid T entity) {
+    public ResponseEntity<T> create(@RequestBody @Valid T entity) {
         T newEntity = service.create(entity);
         ID id = service.extractId(newEntity);
         // Build an uri to new entity in database
