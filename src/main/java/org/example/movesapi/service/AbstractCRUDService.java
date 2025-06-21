@@ -134,9 +134,14 @@ public abstract class AbstractCRUDService<T, ID> implements CRUDService<T, ID> {
         if (filter.isPresent()) {
             return filter(filter.get(), pageable);
         }
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        if (page < 0 || size <= 0 || size > 100) {
+            throw new IllegalArgumentException("Invalid pagination parameters: page=" + page + ", size=" + size);
+        }
         return repository.findAll(PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
+                page,
+                size,
                 pageable.getSortOr(Sort.by(
                         Sort.Order.asc("name").ignoreCase()
                 ))
