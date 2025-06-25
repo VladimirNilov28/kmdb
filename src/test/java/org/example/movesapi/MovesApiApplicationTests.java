@@ -222,7 +222,7 @@ class MovesApiApplicationTests {
         ResponseEntity<Void> repsonse = restTemplate
                 .withBasicAuth("admin", "admin")
                 .exchange("/movies/1", HttpMethod.DELETE, null, Void.class);
-        assertThat(repsonse.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(repsonse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
 //    @Test
