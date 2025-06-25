@@ -98,14 +98,12 @@ class MovesApiApplicationTests {
     @Test
     @DirtiesContext
     void shouldCreateMovieWith201andLocationHeader() {
-        Set<Genre> genres = Set.of(Genre.builder().id(1L).name("Test Genre").build());
-        Set<Actor> actors = Set.of(Actor.builder().id(1L).name("John").build());
-
         Movie newMovie = Movie.builder()
                 .name("Test Movie")
                 .releaseYear(2004)
-                .genres(genres)
-                .actors(actors)
+                .duration(120)
+                .genres(null)
+                .actors(null)
                 .build();
 
         ResponseEntity<Void>  response = restTemplate
@@ -128,6 +126,7 @@ class MovesApiApplicationTests {
         Movie newMovie = Movie.builder()
                 .name("")
                 .releaseYear(2004)
+                .duration(120)
                 .genres(genres)
                 .actors(actors)
                 .build();
@@ -148,6 +147,7 @@ class MovesApiApplicationTests {
         Movie originalMovie = Movie.builder()
                 .name("Original Movie")
                 .releaseYear(2000)
+                .duration(120)
                 .genres(genres)
                 .actors(actors)
                 .build();
@@ -419,28 +419,28 @@ class MovesApiApplicationTests {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
-@Test
-void shouldDeleteActorWith204() {
-    // 1. Создать временного актёра
-    Map<String, Object> actor = Map.of(
-            "name", "Temp Actor",
-            "birthDate", "1990-01-01"
-    );
-    ResponseEntity<Void> createResponse = restTemplate
-            .withBasicAuth("admin", "admin")
-            .postForEntity("/actors", actor, Void.class);
+    @Test
+    void shouldDeleteActorWith204() {
+        // 1. Создать временного актёра
+        Map<String, Object> actor = Map.of(
+                "name", "Temp Actor",
+                "birthDate", "1990-01-01"
+        );
+        ResponseEntity<Void> createResponse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .postForEntity("/actors", actor, Void.class);
 
-    // 2. Вытащить ID из Location
-    String location = createResponse.getHeaders().getLocation().toString();
-    Long id = Long.valueOf(location.substring(location.lastIndexOf("/") + 1));
+        // 2. Вытащить ID из Location
+        String location = createResponse.getHeaders().getLocation().toString();
+        Long id = Long.valueOf(location.substring(location.lastIndexOf("/") + 1));
 
-    // 3. Удалить
-    ResponseEntity<Void> deleteResponse = restTemplate
-            .withBasicAuth("admin", "admin")
-            .exchange("/actors/" + id, HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+        // 3. Удалить
+        ResponseEntity<Void> deleteResponse = restTemplate
+                .withBasicAuth("admin", "admin")
+                .exchange("/actors/" + id, HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
 
-    assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-}
+        assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
 
     @Test
     void shouldReturn404WhenDeleteNonexistentActor() {

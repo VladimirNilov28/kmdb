@@ -101,6 +101,7 @@ public class DataLoader implements CommandLineRunner {
             Movie movie = Movie.builder()
                     .name(m.get("name").asText())
                     .releaseYear(m.get("releaseYear").asInt())
+                    .duration(m.get("duration").asInt())
                     .genres(genres)
                     .actors(actors)
                     .build();

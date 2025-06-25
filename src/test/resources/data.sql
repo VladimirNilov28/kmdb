@@ -20,17 +20,17 @@ INSERT INTO actor (id, name, birth_date) VALUES
                                              (9, 'Russell Crowe', '1964-04-07');
 
 -- Фильмы
-INSERT INTO movie (id, name, release_year) VALUES
-                                                     (1, 'The Matrix', 1999),
-                                                     (2, 'Inception', 2010),
-                                                     (3, 'Interstellar', 2014),
-                                                     (4, 'John Wick', 2014),
-                                                     (5, 'The Godfather', 1972),
-                                                     (6, 'Pulp Fiction', 1994),
-                                                     (7, 'The Dark Knight', 2008),
-                                                     (8, 'Fight Club', 1999),
-                                                     (9, 'Forrest Gump', 1994),
-                                                     (10, 'Gladiator', 2000);
+INSERT INTO movie (id, name, release_year, duration) VALUES
+                                                     (1, 'The Matrix', 1999, 120),
+                                                     (2, 'Inception', 2010, 120),
+                                                     (3, 'Interstellar', 2014, 120),
+                                                     (4, 'John Wick', 2014, 120),
+                                                     (5, 'The Godfather', 1972, 120),
+                                                     (6, 'Pulp Fiction', 1994, 120),
+                                                     (7, 'The Dark Knight', 2008, 120),
+                                                     (8, 'Fight Club', 1999, 120),
+                                                     (9, 'Forrest Gump', 1994, 120),
+                                                     (10, 'Gladiator', 2000, 120);
 
 -- Связи Movie ↔ Actors
 INSERT INTO movie_actors (movie_id, actor_id) VALUES

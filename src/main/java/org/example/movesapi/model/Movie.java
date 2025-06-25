@@ -50,6 +50,10 @@ public class Movie {
     @Range(min = 1895, max = 2040)
     private int releaseYear;
 
+    @NotNull
+    @Range(min = 60, max = 1000)
+    private int duration;
+
     @Builder.Default
     @ManyToMany
     @JoinTable(

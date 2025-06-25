@@ -103,6 +103,7 @@
       "id": 1,
       "name": "Shadows of Tomorrow",
       "releaseYear": 2018,
+      "duration": 120,
       "genres": [
         {
           "id": 1
@@ -133,6 +134,7 @@
       "id": 2,
       "name": "Eternal Horizon",
       "releaseYear": 2017,
+      "duration": 120,
       "genres": [
         {
           "id": 2
@@ -154,6 +156,7 @@
       "id": 3,
       "name": "Whispers in the Wind",
       "releaseYear": 2003,
+      "duration": 120,
       "genres": [
         {
           "id": 2
@@ -175,6 +178,7 @@
       "id": 4,
       "name": "Midnight Echoes",
       "releaseYear": 2002,
+      "duration": 120,
       "genres": [
         {
           "id": 2
@@ -202,6 +206,7 @@
       "id": 5,
       "name": "Chronicles of the Lost",
       "releaseYear": 2007,
+      "duration": 120,
       "genres": [
         {
           "id": 1
@@ -223,6 +228,7 @@
       "id": 6,
       "name": "Fragments of Light",
       "releaseYear": 2013,
+      "duration": 120,
       "genres": [
         {
           "id": 2
@@ -244,6 +250,7 @@
       "id": 7,
       "name": "Veil of Secrets",
       "releaseYear": 2016,
+      "duration": 120,
       "genres": [
         {
           "id": 2
@@ -271,6 +278,7 @@
       "id": 8,
       "name": "Beyond the Silence",
       "releaseYear": 2009,
+      "duration": 120,
       "genres": [
         {
           "id": 5
@@ -289,6 +297,7 @@
       "id": 9,
       "name": "Dance of Shadows",
       "releaseYear": 2004,
+      "duration": 120,
       "genres": [
         {
           "id": 5
@@ -313,6 +322,7 @@
       "id": 10,
       "name": "Empire of Dreams",
       "releaseYear": 2004,
+      "duration": 120,
       "genres": [
         {
           "id": 3
@@ -334,6 +344,7 @@
       "id": 11,
       "name": "Rise of the Phoenix",
       "releaseYear": 2002,
+      "duration": 120,
       "genres": [
         {
           "id": 2
@@ -358,6 +369,7 @@
       "id": 12,
       "name": "The Silent Storm",
       "releaseYear": 2020,
+      "duration": 120,
       "genres": [
         {
           "id": 2
@@ -385,6 +397,7 @@
       "id": 13,
       "name": "Echoes of Eternity",
       "releaseYear": 1994,
+      "duration": 120,
       "genres": [
         {
           "id": 5
@@ -409,6 +422,7 @@
       "id": 14,
       "name": "Winds of Change",
       "releaseYear": 1995,
+      "duration": 120,
       "genres": [
         {
           "id": 4
@@ -430,6 +444,7 @@
       "id": 15,
       "name": "Realm of Illusions",
       "releaseYear": 2012,
+      "duration": 120,
       "genres": [
         {
           "id": 1
@@ -457,6 +472,7 @@
       "id": 16,
       "name": "Fading Twilight",
       "releaseYear": 2018,
+      "duration": 120,
       "genres": [
         {
           "id": 5
@@ -478,6 +494,7 @@
       "id": 17,
       "name": "Pulse of Destiny",
       "releaseYear": 2003,
+      "duration": 120,
       "genres": [
         {
           "id": 2
@@ -505,6 +522,7 @@
       "id": 18,
       "name": "Canvas of Memories",
       "releaseYear": 1999,
+      "duration": 120,
       "genres": [
         {
           "id": 2
@@ -529,6 +547,7 @@
       "id": 19,
       "name": "Journey to Nowhere",
       "releaseYear": 1992,
+      "duration": 120,
       "genres": [
         {
           "id": 5
@@ -553,6 +572,7 @@
       "id": 20,
       "name": "Blade of Illusion",
       "releaseYear": 2025,
+      "duration": 120,
       "genres": [
         {
           "id": 3
